@@ -16,11 +16,10 @@ const entities = JSON.parse(readFileSync(mapPath, 'utf8'));
 const names = Object.keys(entities);
 if (names.length < 2000) throw new Error('实体表异常：条目数 ' + names.length);
 
-// 转义 TS 字符串字面量
-const esc = (s) => s.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+// 生成 TS 字符串字面量（JSON.stringify 可处理控制字符与引号）
 const rows = names
   .sort()
-  .map((k) => `  '${esc(k)}': '${esc(entities[k])}',`)
+  .map((k) => `  ${JSON.stringify(k)}: ${JSON.stringify(entities[k])},`)
   .join('\n');
 
 const ts = `// 本文件由 scripts/gen-entities.mjs 生成，勿手改。
