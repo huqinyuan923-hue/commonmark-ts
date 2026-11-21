@@ -83,6 +83,43 @@ export class MdNode {
   }
 }
 
+/** 归一化副本：递归合并相邻 text 节点（实体/转义在再解析时会拆分 text，语义等价） */
+export function normalizeAst(node: MdNode): MdNode {
+  const copy = new MdNode(node.type);
+  copy.literal = node.literal;
+  copy.level = node.level;
+  copy.info = node.info;
+  copy.isFenced = node.isFenced;
+  copy.destination = node.destination;
+  copy.title = node.title;
+  if (node.listData) {
+    copy.listData = { ...node.listData };
+  }
+  const merged: MdNode[] = [];
+  for (const child of node.children) {
+    const c = normalizeAst(child);
+    // 空文本节点（如行尾空格被剥离后的残留）渲染为空串，比较时丢弃
+    if (c.type === 'text' && (c.literal ?? '') === '') {
+      continue;
+    }
+    const prev = merged.length > 0 ? merged[merged.length - 1]! : null;
+    if (
+      prev !== null &&
+      prev.type === 'text' &&
+      c.type === 'text' &&
+      prev.literal !== null &&
+      c.literal !== null
+    ) {
+      prev.literal = prev.literal + c.literal;
+    } else {
+      merged.push(c);
+      c.parent = copy;
+    }
+  }
+  copy.children = merged;
+  return copy;
+}
+
 /** 深比较两棵 AST（type / literal / level / info / listData 语义字段 / destination / title / children） */
 export function astEquals(a: MdNode, b: MdNode): boolean {
   if (a.type !== b.type) return false;

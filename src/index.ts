@@ -1,8 +1,9 @@
 // 公开 API：parseBlocks / parseInlines / renderHtml（任务书规定的三个入口）。
 // 内部 MdNode 在导出边界收敛为任务书规定的 { type, children?, literal?, attrs? } 形状。
-import { MdNode, astEquals, printAst } from './ast.js';
+import { MdNode, astEquals, normalizeAst, printAst } from './ast.js';
 import { BlockParser } from './blocks.js';
 import { InlineParser } from './inlines.js';
+import { parseInternal } from './pipeline.js';
 import { renderHtml as renderHtmlInternal, RenderOptions } from './render-html.js';
 
 export interface Node {
@@ -12,7 +13,8 @@ export interface Node {
   attrs?: Record<string, string>;
 }
 
-export { astEquals, printAst };
+export { astEquals, normalizeAst, printAst };
+export { printMarkdown } from './render-md.js';
 
 /** 内部节点 → 公开 Node（attrs 承载结构化元数据） */
 function toPublic(node: MdNode): Node {
@@ -97,22 +99,7 @@ export interface RenderHtmlOptions {
 
 /** 完整管线：块级解析 → 链接引用定义 → 内联解析 → HTML 渲染 */
 export function renderHtml(src: string, opts: RenderHtmlOptions = {}): string {
-  const blockParser = new BlockParser({ smart: opts.smart });
-  const doc = blockParser.parse(src);
-  blockParser.inlineParser.refmap = blockParser.refmap;
-  blockParser.inlineParser.options = { smart: opts.smart ?? false };
-  parseTreeInlines(doc, blockParser.inlineParser);
+  const doc = parseInternal(src, { smart: opts.smart ?? false });
   const renderOpts: RenderOptions = { softbreakHard: opts.softbreakHard };
   return renderHtmlInternal(doc, renderOpts);
-}
-
-/** 遍历块树，对段落与标题做内联解析 */
-function parseTreeInlines(block: MdNode, inlineParser: InlineParser): void {
-  for (const child of block.children) {
-    if (child.type === 'paragraph' || child.type === 'heading') {
-      inlineParser.parse(child);
-    } else if (child.children.length > 0) {
-      parseTreeInlines(child, inlineParser);
-    }
-  }
 }
