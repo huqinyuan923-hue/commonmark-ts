@@ -14,6 +14,7 @@
     "vitest": "^2.1.9",
     "esbuild": "^0.24.0",
     "commonmark": "0.31.2",
-    "commonmark-spec": "0.31.2"
+    "commonmark-spec": "0.31.2",
+    "entities": "~3.0.1"
   }
 }
