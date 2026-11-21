@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>CommonMark Lab · 纯 TS 手写解析器</title>
+    <style>
+      :root {
+        --bg: #14161a;
+        --panel: #1c1f26;
+        --panel2: #22262e;
+        --border: #2f3440;
+        --text: #d7dae0;
+        --muted: #8b93a1;
+        --accent: #4f9cff;
+        --ok: #3fb96f;
+      }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; height: 100%; background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; }
+      #app { display: flex; flex-direction: column; height: 100vh; }
+      header { display: flex; align-items: center; gap: 12px; padding: 10px 16px; border-bottom: 1px solid var(--border); background: var(--panel); }
+      header h1 { font-size: 15px; margin: 0; font-weight: 600; }
+      .sub { font-size: 12px; color: var(--muted); }
+      .spacer { flex: 1; }
+      header label { font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 5px; cursor: pointer; }
+      header button { background: var(--panel2); border: 1px solid var(--border); color: var(--text); padding: 4px 10px; border-radius: 5px; cursor: pointer; font-size: 12px; }
+      main { flex: 1; display: grid; grid-template-columns: 1fr 1fr; min-height: 0; }
+      .pane { display: flex; flex-direction: column; min-width: 0; min-height: 0; border-right: 1px solid var(--border); }
+      .pane:last-child { border-right: none; }
+      .tabs { display: flex; gap: 2px; padding: 6px 10px; background: var(--panel); border-bottom: 1px solid var(--border); }
+      .tabs button { background: none; border: 1px solid transparent; color: var(--muted); padding: 3px 10px; border-radius: 5px; cursor: pointer; font-size: 12px; }
+      .tabs button.active { background: var(--panel2); color: var(--text); border-color: var(--border); }
+      #editor { flex: 1; resize: none; border: none; outline: none; background: var(--panel); color: var(--text); padding: 14px; font-family: Consolas, 'Cascadia Mono', monospace; font-size: 13px; line-height: 1.55; tab-size: 4; }
+      .viewbox { flex: 1; overflow: auto; min-height: 0; }
+      #view-doc { background: #fafafa; color: #222; padding: 14px 18px; }
+      #view-doc pre { background: #f0f1f3; padding: 10px 12px; border-radius: 6px; overflow: auto; font-size: 12.5px; }
+      #view-doc code { background: #eceef1; padding: 1px 4px; border-radius: 3px; font-size: 12.5px; }
+      #view-doc pre code { background: none; padding: 0; }
+      #view-doc blockquote { border-left: 3px solid #c5ccd6; margin: 8px 0; padding: 2px 12px; color: #555; }
+      #view-raw, #view-ast { padding: 12px 16px; background: var(--panel); color: var(--muted); font-family: Consolas, monospace; font-size: 12px; line-height: 1.5; white-space: pre-wrap; word-break: break-all; }
+      #statusbar { display: flex; gap: 16px; padding: 6px 16px; border-top: 1px solid var(--border); background: var(--panel); font-size: 12px; color: var(--muted); }
+      .ok { color: var(--ok); }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+      <header>
+        <h1>CommonMark Lab</h1>
+        <span class="sub">纯 TypeScript 手写解析器 · 零运行时依赖 · 官方 652 例对拍 100%</span>
+        <span class="spacer"></span>
+        <label><input type="checkbox" id="opt-smart" /> smart 标点</label>
+        <label><input type="checkbox" id="opt-hard" /> 软换行→br</label>
+        <button id="btn-sample">示例</button>
+      </header>
+      <main>
+        <div class="pane" id="pane-l">
+          <textarea id="editor" spellcheck="false" placeholder="在此输入 Markdown…"></textarea>
+        </div>
+        <div class="pane" id="pane-r">
+          <div class="tabs" id="tabs-r">
+            <button data-v="doc" class="active">预览</button>
+            <button data-v="html">HTML</button>
+            <button data-v="ast">AST</button>
+            <button data-v="rt">重打印</button>
+          </div>
+          <div class="viewbox">
+            <div id="view-doc" class="viewpage"></div>
+            <pre id="view-html" class="viewpage" style="display: none"></pre>
+            <pre id="view-ast" class="viewpage" style="display: none"></pre>
+            <pre id="view-rt" class="viewpage" style="display: none"></pre>
+          </div>
+        </div>
+      </main>
+      <footer id="statusbar">
+        <span id="stat-count">0 字符</span>
+        <span id="stat-parse">未解析</span>
+        <span class="spacer"></span>
+        <span>oracle: commonmark-spec 0.31.2</span>
+      </footer>
+    </div>
+    <script>
+      /*__BUNDLE__*/
+    </script>
+  </body>
+</html>
